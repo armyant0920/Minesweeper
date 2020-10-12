@@ -1,13 +1,10 @@
-import com.sun.org.apache.bcel.internal.classfile.Constant;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.Objects;
 
-public class Mine extends JButton {
+public class Block extends JButton {
 
-    private int x;
-    private int y;
+    private int posX;
+    private int posY;
 
     private boolean bomb = false;
     private boolean flag = false;
@@ -15,10 +12,20 @@ public class Mine extends JButton {
     private String text;
     private Color color = Color.GREEN;
 
-    public Mine(int x,int y) {
+
+    public int getPosX() {
+        return posX;
+    }
+
+
+    public int getPosY() {
+        return posY;
+    }
+
+    public Block(int x, int y) {
         this.setBackground(color);
-        this.x=x;
-        this.y=y;
+        this.posX =x;
+        this.posY =y;
         this.text=x+"/"+y;
 
 

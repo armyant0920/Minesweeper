@@ -8,7 +8,9 @@ import java.util.*;
 
 public class GamePanel extends JFrame implements ActionListener, KeyListener, ItemListener, MenuListener, MouseInputListener {
 
-    private ArrayList<Mine> blockList;
+    private ArrayList<Block> blockList;
+
+    private static Block[]map;
     private final String difficulty[] = {"easy", "medium", "hard"};
 
     private final Map<String, Integer> hard = new HashMap<String, Integer>() {{
@@ -30,19 +32,29 @@ public class GamePanel extends JFrame implements ActionListener, KeyListener, It
     }
 
     ;
-
+    public void countInsets(){
+        Insets insets=this.getInsets();
+        System.out.printf("top=%d\n",insets.top);
+        System.out.printf("left=%d\n",insets.left);
+        System.out.printf("right=%d\n",insets.right);
+        System.out.printf("bottom=%d\n",insets.bottom);
+    }
     public void init() {
 
         blockList = new ArrayList<>();
         this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);//
         addMenu();
-        this.setSize(500, 500);
+
+
+        this.setSize(800, 800+this.getJMenuBar().getHeight()+26);
         this.setLocationRelativeTo(null);
         //設定各種listener
 
         this.setTitle("踩地雷實驗");
         this.setVisible(true);
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        countInsets();
+
 
 
     }
@@ -67,29 +79,40 @@ public class GamePanel extends JFrame implements ActionListener, KeyListener, It
 
     }
 
-    private void showMine(){
+    /**
+     * 暫時先只顯示特定格子周遭
+     */
+    private void showMine(Block b){
 
-  /*      for(int i=0;i<gridNum;i++){
-            for(int j=0;j<gridNum;j++){
+        int x=b.getPosX();
 
-                //先確認目前pick到的格子
-                int xStart=()
+        int y=b.getPosY();
+        int index;
+        System.out.printf("X=%d,Y=%d",x,y);
+        System.out.println(b.getBounds());
+        for(int i=0;i<=blockList.size();i++){
+
+            if(blockList.get(i)==b){
+                index=i;
+                break;
 
             }
+        }
+//如果x-1>0,表示左邊有一欄,如果x+1<寬,表示右邊有一欄
+        //如果
+        int xStart=(index-1>=0)?i-1:0;
 
 
-        }*/
-
-        for(int i=0;i<blockList.size();i++){
+       /* for(int i=0;i<blockList.size();i++){
 
             int xStart=(i-1>=0)?i-1:0;
             int xEnd=(i+1<width)?i+1:width-1;
             int yStart=(i-width>=0)?i-width:0;
             int yEnd=(i+width<height)?i+height:height;
 
-        }
+        }*/
 
-    for(Mine m:blockList){
+    /*for(Block m:blockList){
 
         int xStart=(m.getX()-1>=0)?m.getX()-1:0;
         int xEnd=(m.getX()+1<gridNum)?m.getX()+1:gridNum-1;
@@ -102,7 +125,8 @@ public class GamePanel extends JFrame implements ActionListener, KeyListener, It
             }
         }
 
-    }
+
+    }*/
 
 
     }
@@ -116,7 +140,7 @@ public class GamePanel extends JFrame implements ActionListener, KeyListener, It
             Object selectedValue = JOptionPane.showInputDialog(null, "請選遊戲難度", "難度設定",
                     JOptionPane.INFORMATION_MESSAGE, null, difficulty, difficulty[0]);
             if (selectedValue != null) {
-                for (Mine mine : blockList) {
+                for (Block mine : blockList) {
                     this.remove(mine);
                 }
                 blockList.clear();
@@ -127,7 +151,7 @@ public class GamePanel extends JFrame implements ActionListener, KeyListener, It
                 System.out.println(gridNum);
                 for (int i = 0; i < gridNum; i++) {
                     for (int j = 0; j < gridNum; j++) {
-                        Mine mine = new Mine(i,j);
+                        Block mine = new Block(i,j);
                         mine.addMouseListener(this);
                         blockList.add(mine);
                         this.add(mine);
@@ -155,8 +179,12 @@ public class GamePanel extends JFrame implements ActionListener, KeyListener, It
                     default:
                 }
                 this.pack();
-                this.setSize(500, 500);
+
+                this.setSize(800, 800+this.getJMenuBar().getHeight()+26);
+
                 this.setLocationRelativeTo(null);
+                System.out.println("Height"+this.getJMenuBar().getHeight());
+                countInsets();
             }
 //            this.setSize(DEFAULT_SIZE);
         }
@@ -222,11 +250,12 @@ public class GamePanel extends JFrame implements ActionListener, KeyListener, It
         if (e.getButton() == MouseEvent.BUTTON1) {
 
             System.out.println("press left");
-            if (e.getSource() instanceof Mine) {
+            if (e.getSource() instanceof Block) {
 
-                Mine mine = (Mine) e.getSource();
-                if (!mine.getOpen() && !mine.getFlag()) {
-                    mine.Open(true);
+                Block b = (Block) e.getSource();
+                if (!b.getOpen() && !b.getFlag()) {
+                    b.Open(true);
+                    showMine(b);
                 }
             }
 
@@ -237,8 +266,8 @@ public class GamePanel extends JFrame implements ActionListener, KeyListener, It
 
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             System.out.println("press right");
-            if (e.getSource() instanceof Mine) {
-                Mine mine = (Mine) e.getSource();
+            if (e.getSource() instanceof Block) {
+                Block mine = (Block) e.getSource();
                 if (!mine.getOpen())
                     mine.mark();
             }
